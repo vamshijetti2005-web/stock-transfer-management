@@ -88,7 +88,10 @@ npm test
 
 ## Live URL
 
-_Pending first deploy. Follow **Deployment** below, then paste the Vercel URL here._
+- **API:** https://stock-transfer-management-vlvq.onrender.com  
+- **Frontend:** _Pending Vercel deploy_
+
+Health check: https://stock-transfer-management-vlvq.onrender.com/api/health
 
 ## Deployment (Phase 3)
 
