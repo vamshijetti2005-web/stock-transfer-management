@@ -1,0 +1,170 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Transfers</h1>
+      <p>Create requests, manage status, and view transfer history.</p>
+    </div>
+    <button type="button" class="btn ghost" (click)="loadTransfers()" [disabled]="loading">
+      Refresh
+    </button>
+  </header>
+
+  @if (error) {
+    <div class="alert error">{{ error }}</div>
+  }
+  @if (success) {
+    <div class="alert success">{{ success }}</div>
+  }
+
+  <form class="panel form" [formGroup]="transferForm" (ngSubmit)="createTransfer()">
+    <h2>New transfer request</h2>
+    <div class="form-grid">
+      <label>
+        From warehouse
+        <select formControlName="fromWarehouseId">
+          <option value="">Select source</option>
+          @for (warehouse of warehouses; track warehouse._id) {
+            <option [value]="warehouse._id">
+              {{ warehouse.code }} — {{ warehouse.name }}
+            </option>
+          }
+        </select>
+      </label>
+      <label>
+        To warehouse
+        <select formControlName="toWarehouseId">
+          <option value="">Select destination</option>
+          @for (warehouse of warehouses; track warehouse._id) {
+            <option [value]="warehouse._id">
+              {{ warehouse.code }} — {{ warehouse.name }}
+            </option>
+          }
+        </select>
+      </label>
+      <label>
+        SKU
+        <select formControlName="sku" (change)="onSkuChange(($any($event.target)).value)">
+          <option value="">Select SKU from source stock</option>
+          @for (item of availableSkus; track item.sku) {
+            <option [value]="item.sku">
+              {{ item.sku }} — {{ item.name }} (qty {{ item.quantity }})
+            </option>
+          }
+        </select>
+      </label>
+      <label>
+        Item name
+        <input formControlName="name" placeholder="Auto-filled from SKU" readonly />
+      </label>
+      <label>
+        Quantity
+        <input type="number" min="1" formControlName="quantity" />
+      </label>
+      <label>
+        Notes
+        <input formControlName="notes" placeholder="Optional" />
+      </label>
+    </div>
+    @if (transferForm.controls.fromWarehouseId.value && availableSkus.length === 0) {
+      <p class="muted">Selected source warehouse has no stock items.</p>
+    }
+    <button class="btn primary" type="submit" [disabled]="saving">Create transfer</button>
+  </form>
+
+  <section class="panel">
+    <div class="list-header">
+      <h2>Transfer history</h2>
+      <label class="filter">
+        Status
+        <select [value]="statusFilter" (change)="onFilterChange(($any($event.target)).value)">
+          <option value="">All</option>
+          <option value="PENDING">PENDING</option>
+          <option value="IN_TRANSIT">IN_TRANSIT</option>
+          <option value="COMPLETED">COMPLETED</option>
+          <option value="CANCELLED">CANCELLED</option>
+        </select>
+      </label>
+    </div>
+
+    @if (loading) {
+      <p class="muted">Loading transfers…</p>
+    } @else if (transfers.length === 0) {
+      <p class="muted">No transfers yet.</p>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>From</th>
+              <th>To</th>
+              <th>Items</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (transfer of transfers; track transfer._id) {
+              <tr>
+                <td>{{ warehouseLabel(transfer.fromWarehouse) }}</td>
+                <td>{{ warehouseLabel(transfer.toWarehouse) }}</td>
+                <td>
+                  <ul class="item-list">
+                    @for (item of transfer.items; track item.sku) {
+                      <li>{{ item.sku }} · {{ item.name }} · qty {{ item.quantity }}</li>
+                    }
+                  </ul>
+                </td>
+                <td>
+                  <span class="badge" [attr.data-status]="transfer.status">
+                    {{ transfer.status }}
+                  </span>
+                  <button
+                    type="button"
+                    class="btn linkish"
+                    (click)="toggleTimeline(transfer._id)"
+                  >
+                    {{ expandedId === transfer._id ? 'Hide timeline' : 'Timeline' }}
+                  </button>
+                </td>
+                <td>{{ transfer.createdAt | date: 'medium' }}</td>
+                <td class="actions">
+                  @for (action of nextActions(transfer.status); track action) {
+                    <button
+                      type="button"
+                      class="btn ghost"
+                      [disabled]="saving"
+                      (click)="updateStatus(transfer, action)"
+                    >
+                      {{ actionLabel(action) }}
+                    </button>
+                  }
+                  @if (nextActions(transfer.status).length === 0) {
+                    <span class="muted">—</span>
+                  }
+                </td>
+              </tr>
+              @if (expandedId === transfer._id) {
+                <tr class="timeline-row">
+                  <td colspan="6">
+                    <ol class="timeline">
+                      @for (entry of transfer.statusHistory || []; track entry.at + entry.status) {
+                        <li>
+                          <strong>{{ entry.status }}</strong>
+                          <span>{{ entry.at | date: 'medium' }}</span>
+                          <span class="muted">by {{ entry.by || 'system' }}</span>
+                        </li>
+                      } @empty {
+                        <li class="muted">No timeline events.</li>
+                      }
+                    </ol>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</section>

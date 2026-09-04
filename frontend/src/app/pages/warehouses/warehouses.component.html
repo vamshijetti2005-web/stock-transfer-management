@@ -1,0 +1,115 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Warehouses</h1>
+      <p>Create warehouses and maintain stock levels.</p>
+    </div>
+    <button type="button" class="btn ghost" (click)="loadWarehouses()" [disabled]="loading">
+      Refresh
+    </button>
+  </header>
+
+  @if (error) {
+    <div class="alert error">{{ error }}</div>
+  }
+  @if (success) {
+    <div class="alert success">{{ success }}</div>
+  }
+
+  <div class="layout">
+    <form class="panel form" [formGroup]="warehouseForm" (ngSubmit)="createWarehouse()">
+      <h2>New warehouse</h2>
+      <label>
+        Name
+        <input formControlName="name" placeholder="Central Hub" />
+      </label>
+      <label>
+        Code
+        <input formControlName="code" placeholder="WH-A" />
+      </label>
+      <label>
+        Location
+        <input formControlName="location" placeholder="Hyderabad" />
+      </label>
+      <button class="btn primary" type="submit" [disabled]="saving">Create warehouse</button>
+    </form>
+
+    <form class="panel form" [formGroup]="stockForm" (ngSubmit)="saveStock()">
+      <h2>Add / update stock</h2>
+      <label>
+        Warehouse
+        <select [value]="selectedId" (change)="selectWarehouse(($any($event.target)).value)">
+          <option value="">Select warehouse</option>
+          @for (warehouse of warehouses; track warehouse._id) {
+            <option [value]="warehouse._id">
+              {{ warehouse.code }} — {{ warehouse.name }}
+            </option>
+          }
+        </select>
+      </label>
+      <label>
+        SKU
+        <input formControlName="sku" placeholder="SKU-100" />
+      </label>
+      <label>
+        Item name
+        <input formControlName="name" placeholder="Wireless Mouse" />
+      </label>
+      <label>
+        Quantity
+        <input type="number" min="0" formControlName="quantity" />
+      </label>
+      <button class="btn primary" type="submit" [disabled]="saving || !selectedId">
+        Save stock
+      </button>
+    </form>
+  </div>
+
+  <section class="panel">
+    <h2>Warehouse list</h2>
+    @if (loading) {
+      <p class="muted">Loading warehouses…</p>
+    } @else if (warehouses.length === 0) {
+      <p class="muted">No warehouses yet. Create one above.</p>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Location</th>
+              <th>Stock</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (warehouse of warehouses; track warehouse._id) {
+              <tr [class.active]="warehouse._id === selectedId">
+                <td>{{ warehouse.code }}</td>
+                <td>{{ warehouse.name }}</td>
+                <td>{{ warehouse.location || '—' }}</td>
+                <td>
+                  @if (warehouse.items.length) {
+                    <ul class="stock-list">
+                      @for (item of warehouse.items; track item.sku) {
+                        <li>{{ item.sku }} · {{ item.name }} · qty {{ item.quantity }}</li>
+                      }
+                    </ul>
+                  } @else {
+                    <span class="muted">No stock</span>
+                  }
+                </td>
+                <td>
+                  <button type="button" class="btn ghost" (click)="selectWarehouse(warehouse._id)">
+                    Manage
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</section>
