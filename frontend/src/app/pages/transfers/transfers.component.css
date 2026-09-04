@@ -35,6 +35,36 @@
   margin: 0;
 }
 
+.list-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+}
+
+.filter select {
+  min-width: 140px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.4rem 0.55rem;
+  background: #fff;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+}
+
 .filter {
   display: flex;
   align-items: center;

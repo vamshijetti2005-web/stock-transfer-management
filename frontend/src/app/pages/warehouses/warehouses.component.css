@@ -23,15 +23,96 @@
   margin-bottom: 1rem;
 }
 
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.list-header h2 {
+  margin: 0;
+}
+
+.list-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+}
+
+.filter input {
+  width: 160px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+}
+
 .stock-list {
   margin: 0;
   padding-left: 1rem;
 }
 
 .stock-list li {
-  margin: 0.15rem 0;
+  margin: 0.35rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.stock-actions {
+  display: inline-flex;
+  gap: 0.45rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.btn.linkish {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #1d4ed8;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn.linkish.danger,
+.danger-btn {
+  color: #b91c1c;
+}
+
+.danger-btn {
+  border-color: #fecaca;
 }
 
 tr.active {
   background: #eef4ff;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
 }
