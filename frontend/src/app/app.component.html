@@ -1,10 +1,15 @@
 <div class="app-shell">
   <header class="topbar">
-    <a routerLink="/" class="brand">Stock Transfer</a>
-    <nav class="nav">
-      <a routerLink="/warehouses" routerLinkActive="active">Warehouses</a>
-      <a routerLink="/transfers" routerLinkActive="active">Transfers</a>
-    </nav>
+    <a routerLink="/dashboard" class="brand">Stock Transfer</a>
+    @if (auth.isLoggedIn()) {
+      <nav class="nav">
+        <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+        <a routerLink="/warehouses" routerLinkActive="active">Warehouses</a>
+        <a routerLink="/transfers" routerLinkActive="active">Transfers</a>
+        <span class="user">{{ auth.currentUser()?.name }}</span>
+        <button type="button" class="logout" (click)="logout()">Logout</button>
+      </nav>
+    }
   </header>
   <main class="content">
     <router-outlet />

@@ -1,0 +1,74 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Dashboard</h1>
+      <p>Overview of warehouses and transfer activity.</p>
+    </div>
+    <button type="button" class="btn ghost" (click)="load()" [disabled]="loading">Refresh</button>
+  </header>
+
+  @if (error) {
+    <div class="alert error">{{ error }}</div>
+  }
+
+  @if (loading && !stats) {
+    <p class="muted">Loading dashboard…</p>
+  } @else if (stats) {
+    <div class="stats-grid">
+      <div class="stat">
+        <span class="label">Warehouses</span>
+        <strong>{{ stats.warehouses }}</strong>
+      </div>
+      <div class="stat">
+        <span class="label">Pending</span>
+        <strong>{{ stats.transfers.pending }}</strong>
+      </div>
+      <div class="stat">
+        <span class="label">In transit</span>
+        <strong>{{ stats.transfers.inTransit }}</strong>
+      </div>
+      <div class="stat">
+        <span class="label">Completed</span>
+        <strong>{{ stats.transfers.completed }}</strong>
+      </div>
+    </div>
+
+    <section class="panel">
+      <div class="list-header">
+        <h2>Recent transfers</h2>
+        <a routerLink="/transfers">View all</a>
+      </div>
+
+      @if (stats.recentTransfers.length === 0) {
+        <p class="muted">No transfers yet.</p>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>From</th>
+                <th>To</th>
+                <th>Status</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (transfer of stats.recentTransfers; track transfer._id) {
+                <tr>
+                  <td>{{ warehouseLabel(transfer.fromWarehouse) }}</td>
+                  <td>{{ warehouseLabel(transfer.toWarehouse) }}</td>
+                  <td>
+                    <span class="badge" [attr.data-status]="transfer.status">
+                      {{ transfer.status }}
+                    </span>
+                  </td>
+                  <td>{{ transfer.createdAt | date: 'medium' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  }
+</section>

@@ -1,0 +1,112 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.page-header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+}
+
+.page-header p {
+  margin: 0;
+  color: #5b6472;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.list-header h2 {
+  margin: 0;
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.item-list {
+  margin: 0;
+  padding-left: 1rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.btn.linkish {
+  display: block;
+  margin-top: 0.35rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #1d4ed8;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.timeline-row td {
+  background: #f8fafc;
+}
+
+.timeline {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.timeline li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 0.35rem 0;
+  font-size: 0.9rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.badge[data-status='PENDING'] {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge[data-status='IN_TRANSIT'] {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge[data-status='COMPLETED'] {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge[data-status='CANCELLED'] {
+  background: #fee2e2;
+  color: #991b1b;
+}

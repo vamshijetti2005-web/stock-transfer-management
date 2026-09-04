@@ -2,6 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const config = require('./config');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
+const authRoutes = require('./routes/authRoutes');
+const warehouseRoutes = require('./routes/warehouseRoutes');
+const transferRoutes = require('./routes/transferRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 const app = express();
 
@@ -21,7 +25,10 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Routes will be mounted here (warehouses, transfers)
+app.use('/api/auth', authRoutes);
+app.use('/api/warehouses', warehouseRoutes);
+app.use('/api/transfers', transferRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

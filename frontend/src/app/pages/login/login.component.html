@@ -1,0 +1,44 @@
+<section class="auth-page">
+  <form class="auth-card form" [formGroup]="form" (ngSubmit)="submit()">
+    <h1>Stock Transfer</h1>
+    <p class="muted">
+      {{ mode === 'login' ? 'Sign in to manage warehouses and transfers.' : 'Create an account to get started.' }}
+    </p>
+
+    @if (error) {
+      <div class="alert error">{{ error }}</div>
+    }
+
+    @if (mode === 'register') {
+      <label>
+        Name
+        <input formControlName="name" placeholder="Your name" />
+      </label>
+    }
+
+    <label>
+      Email
+      <input type="email" formControlName="email" placeholder="demo@stock.app" />
+    </label>
+    <label>
+      Password
+      <input type="password" formControlName="password" placeholder="••••••••" />
+    </label>
+
+    <button class="btn primary" type="submit" [disabled]="loading">
+      {{ mode === 'login' ? 'Sign in' : 'Create account' }}
+    </button>
+
+    <p class="switch">
+      @if (mode === 'login') {
+        No account?
+        <button type="button" class="link" (click)="switchMode('register')">Register</button>
+      } @else {
+        Already registered?
+        <button type="button" class="link" (click)="switchMode('login')">Sign in</button>
+      }
+    </p>
+
+    <p class="hint muted">Demo after seed: demo&#64;stock.app / Demo&#64;123</p>
+  </form>
+</section>
