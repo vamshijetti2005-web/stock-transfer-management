@@ -74,16 +74,42 @@
   <section class="panel">
     <div class="list-header">
       <h2>Transfer history</h2>
-      <label class="filter">
-        Status
-        <select [value]="statusFilter" (change)="onFilterChange(($any($event.target)).value)">
-          <option value="">All</option>
-          <option value="PENDING">PENDING</option>
-          <option value="IN_TRANSIT">IN_TRANSIT</option>
-          <option value="COMPLETED">COMPLETED</option>
-          <option value="CANCELLED">CANCELLED</option>
-        </select>
-      </label>
+      <div class="list-tools">
+        @if (meta) {
+          <span class="muted">{{ meta.total }} total</span>
+        }
+        <label class="filter">
+          From
+          <select [value]="fromFilter" (change)="onFromFilterChange(($any($event.target)).value)">
+            <option value="">All</option>
+            @for (warehouse of warehouses; track warehouse._id) {
+              <option [value]="warehouse._id">{{ warehouse.code }} — {{ warehouse.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="filter">
+          To
+          <select [value]="toFilter" (change)="onToFilterChange(($any($event.target)).value)">
+            <option value="">All</option>
+            @for (warehouse of warehouses; track warehouse._id) {
+              <option [value]="warehouse._id">{{ warehouse.code }} — {{ warehouse.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="filter">
+          Status
+          <select [value]="statusFilter" (change)="onFilterChange(($any($event.target)).value)">
+            <option value="">All</option>
+            <option value="PENDING">PENDING</option>
+            <option value="IN_TRANSIT">IN_TRANSIT</option>
+            <option value="COMPLETED">COMPLETED</option>
+            <option value="CANCELLED">CANCELLED</option>
+          </select>
+        </label>
+        <button type="button" class="btn ghost" (click)="clearTransferFilters()" [disabled]="loading">
+          Clear
+        </button>
+      </div>
     </div>
 
     @if (loading) {
@@ -165,6 +191,28 @@
           </tbody>
         </table>
       </div>
+
+      @if (meta && meta.totalPages > 1) {
+        <div class="pagination">
+          <button
+            type="button"
+            class="btn ghost"
+            [disabled]="!meta.hasPrev || loading"
+            (click)="goToPage(page - 1)"
+          >
+            Previous
+          </button>
+          <span>Page {{ meta.page }} of {{ meta.totalPages }}</span>
+          <button
+            type="button"
+            class="btn ghost"
+            [disabled]="!meta.hasNext || loading"
+            (click)="goToPage(page + 1)"
+          >
+            Next
+          </button>
+        </div>
+      }
     }
   </section>
 </section>

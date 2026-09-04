@@ -1,6 +1,7 @@
 const Warehouse = require('../models/Warehouse');
 const Transfer = require('../models/Transfer');
 const { AppError } = require('../middleware/errorHandler');
+const { parsePagination, buildMeta } = require('../utils/pagination');
 
 const ALLOWED_TRANSITIONS = {
   PENDING: ['IN_TRANSIT', 'CANCELLED'],
@@ -136,15 +137,43 @@ async function createTransfer({
   });
 }
 
-async function listTransfers({ status } = {}) {
+async function listTransfers({
+  status,
+  fromWarehouseId,
+  toWarehouseId,
+  page,
+  limit,
+} = {}) {
+  const { page: pageNum, limit: limitNum, skip } = parsePagination(
+    { page, limit },
+    { page: 1, limit: 5 }
+  );
+
   const filter = {};
   if (status) {
     filter.status = String(status).toUpperCase();
   }
-  return Transfer.find(filter)
-    .populate('fromWarehouse', 'name code location')
-    .populate('toWarehouse', 'name code location')
-    .sort({ createdAt: -1 });
+  if (fromWarehouseId) {
+    filter.fromWarehouse = fromWarehouseId;
+  }
+  if (toWarehouseId) {
+    filter.toWarehouse = toWarehouseId;
+  }
+
+  const [items, total] = await Promise.all([
+    Transfer.find(filter)
+      .populate('fromWarehouse', 'name code location')
+      .populate('toWarehouse', 'name code location')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum),
+    Transfer.countDocuments(filter),
+  ]);
+
+  return {
+    items,
+    meta: buildMeta({ page: pageNum, limit: limitNum, total }),
+  };
 }
 
 async function getTransferById(id) {

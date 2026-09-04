@@ -2,7 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { ApiResponse, Transfer, TransferStatus } from '../models/api.models';
+import {
+  ApiResponse,
+  PaginatedResult,
+  Transfer,
+  TransferStatus,
+} from '../models/api.models';
 
 @Injectable({ providedIn: 'root' })
 export class TransferService {
@@ -10,14 +15,39 @@ export class TransferService {
 
   constructor(private readonly http: HttpClient) {}
 
-  list(status?: TransferStatus | ''): Observable<Transfer[]> {
-    let params = new HttpParams();
+  list(
+    status?: TransferStatus | '',
+    page = 1,
+    limit = 5,
+    fromWarehouseId = '',
+    toWarehouseId = ''
+  ): Observable<PaginatedResult<Transfer>> {
+    let params = new HttpParams()
+      .set('page', String(page))
+      .set('limit', String(limit));
     if (status) {
       params = params.set('status', status);
     }
-    return this.http
-      .get<ApiResponse<Transfer[]>>(this.baseUrl, { params })
-      .pipe(map((res) => res.data));
+    if (fromWarehouseId) {
+      params = params.set('fromWarehouseId', fromWarehouseId);
+    }
+    if (toWarehouseId) {
+      params = params.set('toWarehouseId', toWarehouseId);
+    }
+
+    return this.http.get<ApiResponse<Transfer[]>>(this.baseUrl, { params }).pipe(
+      map((res) => ({
+        items: res.data,
+        meta: res.meta || {
+          page,
+          limit,
+          total: res.data.length,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
+      }))
+    );
   }
 
   getById(id: string): Observable<Transfer> {

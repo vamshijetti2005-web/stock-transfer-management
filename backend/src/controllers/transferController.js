@@ -12,10 +12,14 @@ async function create(req, res) {
 }
 
 async function list(req, res) {
-  const transfers = await transferService.listTransfers({
+  const result = await transferService.listTransfers({
     status: req.query.status,
+    fromWarehouseId: req.query.fromWarehouseId,
+    toWarehouseId: req.query.toWarehouseId,
+    page: req.query.page,
+    limit: req.query.limit,
   });
-  res.json({ success: true, data: transfers });
+  res.json({ success: true, data: result.items, meta: result.meta });
 }
 
 async function getById(req, res) {

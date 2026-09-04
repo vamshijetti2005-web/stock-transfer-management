@@ -6,6 +6,7 @@ import {
   Validators,
 } from '@angular/forms';
 import {
+  PaginationMeta,
   StockItem,
   Transfer,
   TransferStatus,
@@ -36,6 +37,11 @@ export class TransfersComponent implements OnInit {
   error = '';
   success = '';
   statusFilter: TransferStatus | '' = '';
+  fromFilter = '';
+  toFilter = '';
+  page = 1;
+  limit = 5;
+  meta: PaginationMeta | null = null;
 
   readonly transferForm = this.fb.nonNullable.group({
     fromWarehouseId: ['', Validators.required],
@@ -56,7 +62,7 @@ export class TransfersComponent implements OnInit {
   }
 
   loadWarehouses(): void {
-    this.warehouseService.list().subscribe({
+    this.warehouseService.listOptions().subscribe({
       next: (data) => {
         this.warehouses = data;
         const currentSource = this.transferForm.controls.fromWarehouseId.value;
@@ -73,20 +79,51 @@ export class TransfersComponent implements OnInit {
   loadTransfers(): void {
     this.loading = true;
     this.error = '';
-    this.transferService.list(this.statusFilter).subscribe({
-      next: (data) => {
-        this.transfers = data;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = getErrorMessage(err, 'Failed to load transfers');
-        this.loading = false;
-      },
-    });
+    this.transferService
+      .list(this.statusFilter, this.page, this.limit, this.fromFilter, this.toFilter)
+      .subscribe({
+        next: (result) => {
+          this.transfers = result.items;
+          this.meta = result.meta;
+          this.loading = false;
+        },
+        error: (err) => {
+          this.error = getErrorMessage(err, 'Failed to load transfers');
+          this.loading = false;
+        },
+      });
   }
 
   onFilterChange(value: string): void {
     this.statusFilter = value as TransferStatus | '';
+    this.page = 1;
+    this.loadTransfers();
+  }
+
+  onFromFilterChange(value: string): void {
+    this.fromFilter = value;
+    this.page = 1;
+    this.loadTransfers();
+  }
+
+  onToFilterChange(value: string): void {
+    this.toFilter = value;
+    this.page = 1;
+    this.loadTransfers();
+  }
+
+  clearTransferFilters(): void {
+    this.statusFilter = '';
+    this.fromFilter = '';
+    this.toFilter = '';
+    this.page = 1;
+    this.loadTransfers();
+  }
+
+  goToPage(page: number): void {
+    if (!this.meta) return;
+    if (page < 1 || page > this.meta.totalPages) return;
+    this.page = page;
     this.loadTransfers();
   }
 

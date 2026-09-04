@@ -69,11 +69,15 @@ App runs at `http://localhost:4200`.
 |---|---|---|
 | GET | `/api/health` | Health check |
 | POST | `/api/warehouses` | Create warehouse `{ name, code, location? }` |
-| GET | `/api/warehouses` | List warehouses |
+| GET | `/api/warehouses` | List warehouses (`?page=&limit=&location=`) |
+| GET | `/api/warehouses/options/all` | All warehouses for dropdowns |
 | GET | `/api/warehouses/:id` | Warehouse detail + stock |
+| PUT | `/api/warehouses/:id` | Update warehouse |
+| DELETE | `/api/warehouses/:id` | Delete warehouse |
 | POST | `/api/warehouses/:id/stock` | Upsert stock `{ sku, name, quantity }` |
+| DELETE | `/api/warehouses/:id/stock/:sku` | Delete stock item |
 | POST | `/api/transfers` | Create transfer |
-| GET | `/api/transfers` | List transfers (`?status=PENDING`) |
+| GET | `/api/transfers` | List transfers (`?status=&fromWarehouseId=&toWarehouseId=&page=&limit=`) |
 | GET | `/api/transfers/:id` | Transfer detail |
 | PATCH | `/api/transfers/:id/status` | Update status `{ status }` |
 

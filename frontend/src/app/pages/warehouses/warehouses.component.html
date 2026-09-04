@@ -2,7 +2,7 @@
   <header class="page-header">
     <div>
       <h1>Warehouses</h1>
-      <p>Create warehouses and maintain stock levels.</p>
+      <p>Create, edit, and maintain warehouse stock.</p>
     </div>
     <button type="button" class="btn ghost" (click)="loadWarehouses()" [disabled]="loading">
       Refresh
@@ -17,8 +17,8 @@
   }
 
   <div class="layout">
-    <form class="panel form" [formGroup]="warehouseForm" (ngSubmit)="createWarehouse()">
-      <h2>New warehouse</h2>
+    <form class="panel form" [formGroup]="warehouseForm" (ngSubmit)="submitWarehouse()">
+      <h2>{{ isEditing ? 'Edit warehouse' : 'New warehouse' }}</h2>
       <label>
         Name
         <input formControlName="name" placeholder="Central Hub" />
@@ -31,7 +31,16 @@
         Location
         <input formControlName="location" placeholder="Hyderabad" />
       </label>
-      <button class="btn primary" type="submit" [disabled]="saving">Create warehouse</button>
+      <div class="form-actions">
+        <button class="btn primary" type="submit" [disabled]="saving">
+          {{ isEditing ? 'Save changes' : 'Create warehouse' }}
+        </button>
+        @if (isEditing) {
+          <button class="btn ghost" type="button" (click)="resetWarehouseForm()" [disabled]="saving">
+            Cancel edit
+          </button>
+        }
+      </div>
     </form>
 
     <form class="panel form" [formGroup]="stockForm" (ngSubmit)="saveStock()">
@@ -40,7 +49,7 @@
         Warehouse
         <select [value]="selectedId" (change)="selectWarehouse(($any($event.target)).value)">
           <option value="">Select warehouse</option>
-          @for (warehouse of warehouses; track warehouse._id) {
+          @for (warehouse of allWarehouses; track warehouse._id) {
             <option [value]="warehouse._id">
               {{ warehouse.code }} — {{ warehouse.name }}
             </option>
@@ -66,7 +75,30 @@
   </div>
 
   <section class="panel">
-    <h2>Warehouse list</h2>
+    <div class="list-header">
+      <h2>Warehouse list</h2>
+      <div class="list-tools">
+        @if (meta) {
+          <span class="muted">{{ meta.total }} total</span>
+        }
+        <label class="filter">
+          Location
+          <input
+            type="search"
+            [(ngModel)]="locationFilter"
+            (keyup.enter)="applyLocationFilter()"
+            placeholder="e.g. Hyderabad"
+          />
+        </label>
+        <button type="button" class="btn ghost" (click)="applyLocationFilter()" [disabled]="loading">
+          Search
+        </button>
+        <button type="button" class="btn ghost" (click)="clearLocationFilter()" [disabled]="loading">
+          Clear
+        </button>
+      </div>
+    </div>
+
     @if (loading) {
       <p class="muted">Loading warehouses…</p>
     } @else if (warehouses.length === 0) {
@@ -80,7 +112,7 @@
               <th>Name</th>
               <th>Location</th>
               <th>Stock</th>
-              <th></th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -93,16 +125,46 @@
                   @if (warehouse.items.length) {
                     <ul class="stock-list">
                       @for (item of warehouse.items; track item.sku) {
-                        <li>{{ item.sku }} · {{ item.name }} · qty {{ item.quantity }}</li>
+                        <li>
+                          <span>{{ item.sku }} · {{ item.name }} · qty {{ item.quantity }}</span>
+                          <span class="stock-actions">
+                            <button
+                              type="button"
+                              class="btn linkish"
+                              (click)="editStock(item, warehouse._id)"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              class="btn linkish danger"
+                              (click)="deleteStock(warehouse, item.sku)"
+                              [disabled]="saving"
+                            >
+                              Delete
+                            </button>
+                          </span>
+                        </li>
                       }
                     </ul>
                   } @else {
                     <span class="muted">No stock</span>
                   }
                 </td>
-                <td>
+                <td class="actions">
                   <button type="button" class="btn ghost" (click)="selectWarehouse(warehouse._id)">
-                    Manage
+                    Manage stock
+                  </button>
+                  <button type="button" class="btn ghost" (click)="startEdit(warehouse)">
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    class="btn ghost danger-btn"
+                    (click)="deleteWarehouse(warehouse)"
+                    [disabled]="saving"
+                  >
+                    Delete
                   </button>
                 </td>
               </tr>
@@ -110,6 +172,28 @@
           </tbody>
         </table>
       </div>
+
+      @if (meta && meta.totalPages > 1) {
+        <div class="pagination">
+          <button
+            type="button"
+            class="btn ghost"
+            [disabled]="!meta.hasPrev || loading"
+            (click)="goToPage(page - 1)"
+          >
+            Previous
+          </button>
+          <span>Page {{ meta.page }} of {{ meta.totalPages }}</span>
+          <button
+            type="button"
+            class="btn ghost"
+            [disabled]="!meta.hasNext || loading"
+            (click)="goToPage(page + 1)"
+          >
+            Next
+          </button>
+        </div>
+      }
     }
   </section>
 </section>
